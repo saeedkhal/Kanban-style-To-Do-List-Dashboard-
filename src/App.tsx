@@ -144,11 +144,27 @@ const KanbanBoard = () => {
                   <Col
                     key={col.key}
                     md={3}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const task = JSON.parse(e.dataTransfer.getData("dragedTask"));
+                      
+                      if (task && task.column !== col.key) {
+                        editTaskMutation.mutate({ ...task, column: col.key });
+                      }
+                    }}
                     className={idx !== columns.length - 1 ? "border-end border-1 border-secondary-subtle" : ""}
                   >
                     <h5 className="fw-bold mb-3">{col.title}</h5>
                     {pagedTasks?.map((task) => (
-                      <Card key={task.id} className="mb-3 shadow-sm">
+                      <Card
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("dragedTask", JSON.stringify(task));
+                        }}
+                        key={task.id}
+                        className="mb-3 shadow-sm"
+                      >
                         <Card.Body>
                           <Card.Title as="h6" className="fw-bold">
                             {task.title}
