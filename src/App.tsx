@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { Pencil, Trash } from "react-bootstrap-icons";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 let timer: number | undefined = undefined;
 type Task = {
@@ -56,6 +56,46 @@ const KanbanBoard = () => {
     queryKey: ["tasks", debouncedSearch],
     queryFn: () => fetchTasks(debouncedSearch),
   });
+
+  const queryClient = useQueryClient();
+
+  // Mutations
+  const addTaskMutation = useMutation({
+    mutationFn: (task: Omit<Task, "id">) => axios.post<Task>(API_URL, task).then((res) => res.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: (id: number) => axios.delete(`${API_URL}/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const editTaskMutation = useMutation({
+    mutationFn: (task: Task) => axios.put<Task>(`${API_URL}/${task.id}`, task).then((res) => res.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  // Handlers
+  const handleDelete = (id: number) => deleteTaskMutation.mutate(id);
+
+  const handleAddSave = () => {
+    if (!newTask.title.trim()) return;
+    addTaskMutation.mutate(newTask);
+    setNewTask({ title: "", description: "", column: "backlog" });
+    setShowAddModal(false);
+  };
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+    setShowEditModal(true);
+  };
+
+  const handleEditSave = () => {
+    if (!editingTask) return;
+    editTaskMutation.mutate(editingTask);
+    setShowEditModal(false);
+  };
+
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
       <Container fluid="xxl" className="py-4">
@@ -103,14 +143,11 @@ const KanbanBoard = () => {
                               <Button
                                 variant="outline-secondary"
                                 size="sm"
-                                onClick={() => {
-                                  setEditingTask(task);
-                                  setShowEditModal(true);
-                                }}
+                                onClick={() => handleEdit(task)}
                               >
                                 <Pencil />
                               </Button>
-                              <Button variant="outline-danger" size="sm">
+                              <Button onClick={() => handleDelete(task.id)} variant="outline-danger" size="sm">
                                 <Trash />
                               </Button>
                             </div>
@@ -134,7 +171,11 @@ const KanbanBoard = () => {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" value={newTask.title} />
+              <Form.Control
+                type="text"
+                value={newTask.title}
+                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
@@ -147,7 +188,7 @@ const KanbanBoard = () => {
             </Form.Group>
             <Form.Group>
               <Form.Label>Column</Form.Label>
-              <Form.Select value={newTask.column}>
+              <Form.Select value={newTask.column} onChange={(e) => setNewTask({ ...newTask, column: e.target.value })}>
                 <option value="backlog">Backlog</option>
                 <option value="in-progress">In Progress</option>
                 <option value="review">Review</option>
@@ -160,7 +201,9 @@ const KanbanBoard = () => {
           <Button variant="secondary" onClick={() => setShowAddModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary">Save Task</Button>
+          <Button variant="primary" onClick={handleAddSave} disabled={addTaskMutation.isPending}>
+            {addTaskMutation.isPending ? "Saving..." : "Save Task"}
+          </Button>
         </Modal.Footer>
       </Modal>
 
@@ -190,7 +233,10 @@ const KanbanBoard = () => {
             </Form.Group>
             <Form.Group>
               <Form.Label>Column</Form.Label>
-              <Form.Select value={editingTask?.column || "backlog"}>
+              <Form.Select
+                value={editingTask?.column || "backlog"}
+                onChange={(e) => setEditingTask((prev) => (prev ? { ...prev, column: e.target.value } : null))}
+              >
                 <option value="backlog">Backlog</option>
                 <option value="in-progress">In Progress</option>
                 <option value="review">Review</option>
@@ -203,7 +249,9 @@ const KanbanBoard = () => {
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary">Save Changes</Button>
+          <Button variant="primary" onClick={handleEditSave} disabled={editTaskMutation.isPending}>
+            {editTaskMutation.isPending ? "Saving..." : "Save Changes"}
+          </Button>
         </Modal.Footer>
       </Modal>
     </main>
