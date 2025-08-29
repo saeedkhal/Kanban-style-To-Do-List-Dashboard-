@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { Pencil, Trash } from "react-bootstrap-icons";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 type Task = {
   id: number;
@@ -19,6 +20,10 @@ const columns = [
 
 const API_URL = "http://localhost:4000/tasks";
 
+const fetchTasks = async () => {
+  const response = await axios.get<Task[]>(API_URL);
+  return response.data;
+};
 const KanbanBoard = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -30,14 +35,12 @@ const KanbanBoard = () => {
     column: "backlog",
   });
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // Fetch tasks with React Query
+  const { data: tasks = [] } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: () => fetchTasks(),
+  });
 
-  useEffect(() => {
-    // Fetch tasks from backend (dummy data for now)
-    axios.get(API_URL).then((response) => {
-      setTasks(response.data);
-    });
-  }, []);
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
       <Container fluid="xxl" className="py-4">
