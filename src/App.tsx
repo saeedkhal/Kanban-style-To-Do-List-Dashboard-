@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { Pencil, Trash } from "react-bootstrap-icons";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
+let timer = null;
 type Task = {
   id: number;
   title: string;
@@ -40,11 +41,20 @@ const KanbanBoard = () => {
   });
 
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Fetch tasks with React Query
+  useEffect(() => {
+    if (timer) clearTimeout(timer);
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Fetch tasks with React Query, using debouncedSearch
   const { data: tasks = [] } = useQuery({
-    queryKey: ["tasks", search],
-    queryFn: () => fetchTasks(search),
+    queryKey: ["tasks", debouncedSearch],
+    queryFn: () => fetchTasks(debouncedSearch),
   });
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
@@ -55,7 +65,12 @@ const KanbanBoard = () => {
             {/* Header */}
             <Row className="mb-4 align-items-center">
               <Col>
-                <Form.Control value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search by task title or description" />
+                <Form.Control
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  type="text"
+                  placeholder="Search by task title or description"
+                />
               </Col>
               <Col xs="auto" className="text-end">
                 <Button variant="primary" onClick={() => setShowAddModal(true)}>
@@ -119,7 +134,7 @@ const KanbanBoard = () => {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text"  value={newTask.title} />
+              <Form.Control type="text" value={newTask.title} />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
