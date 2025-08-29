@@ -5,7 +5,7 @@ import { Pencil, Trash } from "react-bootstrap-icons";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
-let timer = null;
+let timer: number | undefined = undefined;
 type Task = {
   id: number;
   title: string;
@@ -45,10 +45,10 @@ const KanbanBoard = () => {
 
   useEffect(() => {
     if (timer) clearTimeout(timer);
-    const handler = setTimeout(() => {
+    timer = setTimeout(() => {
       setDebouncedSearch(search);
     }, 400);
-    return () => clearTimeout(handler);
+    return () => clearTimeout(timer);
   }, [search]);
 
   // Fetch tasks with React Query, using debouncedSearch
