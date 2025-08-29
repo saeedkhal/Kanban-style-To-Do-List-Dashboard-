@@ -20,9 +20,13 @@ const columns = [
 
 const API_URL = "http://localhost:4000/tasks";
 
-const fetchTasks = async () => {
-  const response = await axios.get<Task[]>(API_URL);
-  return response.data;
+const fetchTasks = async (search: string): Promise<Task[]> => {
+  let url = API_URL;
+  if (search.trim()) {
+    url += `?q=${encodeURIComponent(search)}`;
+  }
+  const { data } = await axios.get(url);
+  return data;
 };
 const KanbanBoard = () => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -35,12 +39,13 @@ const KanbanBoard = () => {
     column: "backlog",
   });
 
+  const [search, setSearch] = useState("");
+
   // Fetch tasks with React Query
   const { data: tasks = [] } = useQuery({
-    queryKey: ["tasks"],
-    queryFn: () => fetchTasks(),
+    queryKey: ["tasks", search],
+    queryFn: () => fetchTasks(search),
   });
-
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
       <Container fluid="xxl" className="py-4">
@@ -50,7 +55,7 @@ const KanbanBoard = () => {
             {/* Header */}
             <Row className="mb-4 align-items-center">
               <Col>
-                <Form.Control type="text" placeholder="Search by task title or description" />
+                <Form.Control value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search by task title or description" />
               </Col>
               <Col xs="auto" className="text-end">
                 <Button variant="primary" onClick={() => setShowAddModal(true)}>
@@ -114,7 +119,7 @@ const KanbanBoard = () => {
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
-              <Form.Control type="text" value={newTask.title} />
+              <Form.Control type="text"  value={newTask.title} />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
