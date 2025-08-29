@@ -19,6 +19,7 @@ const columns = [
   { key: "done", title: "Done" },
 ];
 
+const TASKS_PER_PAGE = 5;
 const API_URL = "http://localhost:4000/tasks";
 
 const fetchTasks = async (search: string): Promise<Task[]> => {
@@ -40,6 +41,12 @@ const KanbanBoard = () => {
     column: "backlog",
   });
 
+  const [columnPages, setColumnPages] = useState<{ [key: string]: number }>({
+    backlog: 1,
+    "in-progress": 1,
+    review: 1,
+    done: 1,
+  });
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -123,6 +130,16 @@ const KanbanBoard = () => {
             {/* Kanban Columns */}
             <Row>
               {columns.map((col, idx) => {
+                // Pagination logic for this column
+                const colTasks = tasks.filter((task) => task.column === col.key);
+                const page = columnPages[col.key] || 1;
+                const totalPages = Math.ceil(colTasks.length / TASKS_PER_PAGE) || 1;
+                const pagedTasks = colTasks.slice((page - 1) * TASKS_PER_PAGE, page * TASKS_PER_PAGE) || [];
+
+                const handlePageChange = (newPage: number) => {
+                  setColumnPages((prev) => ({ ...prev, [col.key]: newPage }));
+                };
+
                 return (
                   <Col
                     key={col.key}
@@ -130,30 +147,47 @@ const KanbanBoard = () => {
                     className={idx !== columns.length - 1 ? "border-end border-1 border-secondary-subtle" : ""}
                   >
                     <h5 className="fw-bold mb-3">{col.title}</h5>
-                    {tasks
-                      ?.filter((task) => task.column === col.key)
-                      .map((task) => (
-                        <Card key={task.id} className="mb-3 shadow-sm">
-                          <Card.Body>
-                            <Card.Title as="h6" className="fw-bold">
-                              {task.title}
-                            </Card.Title>
-                            <Card.Text className="small">{task.description}</Card.Text>
-                            <div className="d-flex justify-content-end gap-2">
-                              <Button
-                                variant="outline-secondary"
-                                size="sm"
-                                onClick={() => handleEdit(task)}
-                              >
-                                <Pencil />
-                              </Button>
-                              <Button onClick={() => handleDelete(task.id)} variant="outline-danger" size="sm">
-                                <Trash />
-                              </Button>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      ))}
+                    {pagedTasks?.map((task) => (
+                      <Card key={task.id} className="mb-3 shadow-sm">
+                        <Card.Body>
+                          <Card.Title as="h6" className="fw-bold">
+                            {task.title}
+                          </Card.Title>
+                          <Card.Text className="small">{task.description}</Card.Text>
+                          <div className="d-flex justify-content-end gap-2">
+                            <Button variant="outline-secondary" size="sm" onClick={() => handleEdit(task)}>
+                              <Pencil />
+                            </Button>
+                            <Button onClick={() => handleDelete(task.id)} variant="outline-danger" size="sm">
+                              <Trash />
+                            </Button>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    ))}
+                    {totalPages > 1 && (
+                      <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          disabled={page === 1}
+                          onClick={() => handlePageChange(page - 1)}
+                        >
+                          Prev
+                        </Button>
+                        <span>
+                          Page {page} of {totalPages}
+                        </span>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          disabled={page === totalPages}
+                          onClick={() => handlePageChange(page + 1)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    )}
                   </Col>
                 );
               })}
