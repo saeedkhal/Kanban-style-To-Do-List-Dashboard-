@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { Pencil, Trash } from "react-bootstrap-icons";
+import axios from "axios";
 
 type Task = {
   id: number;
@@ -9,38 +10,14 @@ type Task = {
   description: string;
   column: string;
 };
-const demoTasks = [
-  {
-    id: 1,
-    title: "Design Homepage",
-    description: "Create wireframes and mockups for the new homepage.",
-    column: "backlog",
-  },
-  {
-    id: 2,
-    title: "Implement Auth",
-    description: "Set up user authentication with JWT.",
-    column: "in-progress",
-  },
-  {
-    id: 3,
-    title: "Code Review",
-    description: "Review the new feature branch before merging.",
-    column: "review",
-  },
-  {
-    id: 4,
-    title: "Deploy to Production",
-    description: "Deploy the latest version to the production environment.",
-    column: "done",
-  },
-];
 const columns = [
   { key: "backlog", title: "Backlog" },
   { key: "in-progress", title: "In Progress" },
   { key: "review", title: "Review" },
   { key: "done", title: "Done" },
 ];
+
+const API_URL = "http://localhost:4000/tasks";
 
 const KanbanBoard = () => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -52,6 +29,15 @@ const KanbanBoard = () => {
     description: "",
     column: "backlog",
   });
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    // Fetch tasks from backend (dummy data for now)
+    axios.get(API_URL).then((response) => {
+      setTasks(response.data);
+    });
+  }, []);
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
       <Container fluid="xxl" className="py-4">
@@ -81,7 +67,7 @@ const KanbanBoard = () => {
                     className={idx !== columns.length - 1 ? "border-end border-1 border-secondary-subtle" : ""}
                   >
                     <h5 className="fw-bold mb-3">{col.title}</h5>
-                    {demoTasks
+                    {tasks
                       ?.filter((task) => task.column === col.key)
                       .map((task) => (
                         <Card key={task.id} className="mb-3 shadow-sm">

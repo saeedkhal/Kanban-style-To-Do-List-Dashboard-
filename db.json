@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "new task",
+      "description": "Create a mockup for the new login page",
+      "column": "backlog"
+    },
+    {
+      "id": "2",
+      "title": "Draft user survey",
+      "description": "Prepare questions for the user feedback survey",
+      "column": "in-progress"
+    },
+    {
+      "id": "3",
+      "title": "Implement authentication",
+      "description": "Add OAuth2 support for user logins",
+      "column": "review"
+    },
+    {
+      "id": "4",
+      "title": "Code cleanup",
+      "description": "Refactor code to improve readability",
+      "column": "done"
+    }
+  ]
+}
