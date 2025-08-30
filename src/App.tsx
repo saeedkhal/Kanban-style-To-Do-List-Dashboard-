@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
-import { Pencil, Trash } from "react-bootstrap-icons";
+import { Trash } from "react-bootstrap-icons";
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import EditTAskModal from "./components/EditTAskModal";
 
 let timer: number | undefined = undefined;
 type Task = {
@@ -31,16 +32,13 @@ const fetchTasks = async (search: string): Promise<Task[]> => {
   return data;
 };
 const KanbanBoard = () => {
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTask, setNewTask] = useState<Omit<Task, "id">>({
     title: "",
     description: "",
     column: "backlog",
   });
-const [validated, setValidated] = useState(false); // --- IGNORE ---
+  const [validated, setValidated] = useState(false); // --- IGNORE ---
 
   const [columnPages, setColumnPages] = useState<{ [key: string]: number }>({
     backlog: 1,
@@ -94,18 +92,6 @@ const [validated, setValidated] = useState(false); // --- IGNORE ---
     setValidated(false); // --- IGNORE ---
   };
 
-  const handleEdit = (task: Task) => {
-    setEditingTask(task);
-    setShowEditModal(true);
-  };
-
-  const handleEditSave = () => {
-    if (!editingTask?.title?.trim() || !editingTask?.description?.trim()) return setValidated(true); // --- IGNORE ---
-    editTaskMutation.mutate(editingTask);
-    setShowEditModal(false);
-    setValidated(false); // --- IGNORE ---
-  };
-
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
       <Container fluid="xxl" className="py-4">
@@ -151,7 +137,7 @@ const [validated, setValidated] = useState(false); // --- IGNORE ---
                     onDrop={(e) => {
                       e.preventDefault();
                       const task = JSON.parse(e.dataTransfer.getData("dragedTask"));
-                      
+
                       if (task && task.column !== col.key) {
                         editTaskMutation.mutate({ ...task, column: col.key });
                       }
@@ -174,9 +160,7 @@ const [validated, setValidated] = useState(false); // --- IGNORE ---
                           </Card.Title>
                           <Card.Text className="small">{task.description}</Card.Text>
                           <div className="d-flex justify-content-end gap-2">
-                            <Button variant="outline-secondary" size="sm" onClick={() => handleEdit(task)}>
-                              <Pencil />
-                            </Button>
+                            <EditTAskModal task={task} editTaskMutation={editTaskMutation} />
                             <Button onClick={() => handleDelete(task.id)} variant="outline-danger" size="sm">
                               <Trash />
                             </Button>
@@ -260,58 +244,6 @@ const [validated, setValidated] = useState(false); // --- IGNORE ---
           </Button>
           <Button variant="primary" onClick={handleAddSave} disabled={addTaskMutation.isPending}>
             {addTaskMutation.isPending ? "Saving..." : "Save Task"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* Edit Task Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Task</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form validated={validated}>
-            <Form.Group className="mb-3">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                required
-                value={editingTask?.title || ""}
-                onChange={(e) => setEditingTask((prev) => (prev ? { ...prev, title: e.target.value } : null))}
-              />
-              <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                required
-                value={editingTask?.description || ""}
-                onChange={(e) => setEditingTask((prev) => (prev ? { ...prev, description: e.target.value } : null))}
-              />
-              <Form.Control.Feedback type="invalid">Description is required.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Column</Form.Label>
-              <Form.Select
-                value={editingTask?.column || "backlog"}
-                onChange={(e) => setEditingTask((prev) => (prev ? { ...prev, column: e.target.value } : null))}
-              >
-                <option value="backlog">Backlog</option>
-                <option value="in-progress">In Progress</option>
-                <option value="review">Review</option>
-                <option value="done">Done</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleEditSave} disabled={editTaskMutation.isPending}>
-            {editTaskMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </Modal.Footer>
       </Modal>
