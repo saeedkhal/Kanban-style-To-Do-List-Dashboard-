@@ -1,6 +1,7 @@
 # Kanban-style To-Do List Dashboard
 
-![Kanban Dashboard Screenshot](./public/todo.svg)
+
+![Kanban Dashboard Screenshot](./public/todo.png)
 
 A modern Kanban-style to-do list dashboard with drag-and-drop, built with React, TypeScript, Vite, and json-server for a mock API.
 
@@ -68,11 +69,7 @@ npm run dev
 
 ---
 
-## 📸 App Screenshot
 
-![Kanban Board Screenshot](./public/todo.png)
-
----
 
 ## 🤝 Contributing
 
