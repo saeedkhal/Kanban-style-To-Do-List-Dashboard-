@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 import { Trash } from "react-bootstrap-icons";
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import EditTAskModal from "./components/EditTAskModal";
+import AddTaskModal from "./components/AddTaskModal";
 
 let timer: number | undefined = undefined;
 type Task = {
@@ -32,14 +33,6 @@ const fetchTasks = async (search: string): Promise<Task[]> => {
   return data;
 };
 const KanbanBoard = () => {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newTask, setNewTask] = useState<Omit<Task, "id">>({
-    title: "",
-    description: "",
-    column: "backlog",
-  });
-  const [validated, setValidated] = useState(false); // --- IGNORE ---
-
   const [columnPages, setColumnPages] = useState<{ [key: string]: number }>({
     backlog: 1,
     "in-progress": 1,
@@ -84,14 +77,6 @@ const KanbanBoard = () => {
   // Handlers
   const handleDelete = (id: number) => deleteTaskMutation.mutate(id);
 
-  const handleAddSave = () => {
-    if (!newTask.title.trim()) return setValidated(true); // --- IGNORE ---
-    addTaskMutation.mutate(newTask);
-    setNewTask({ title: "", description: "", column: "backlog" });
-    setShowAddModal(false);
-    setValidated(false); // --- IGNORE ---
-  };
-
   return (
     <main className="bg-dark bg-opacity-10 min-vh-100">
       <Container fluid="xxl" className="py-4">
@@ -109,9 +94,7 @@ const KanbanBoard = () => {
                 />
               </Col>
               <Col xs="auto" className="text-end">
-                <Button variant="primary" onClick={() => setShowAddModal(true)}>
-                  + Add Task
-                </Button>
+                <AddTaskModal addTaskMutation={addTaskMutation} />
               </Col>
             </Row>
             <div className="border-bottom border-1 border-secondary-subtle mb-3" />
@@ -198,55 +181,6 @@ const KanbanBoard = () => {
           </Card.Body>
         </Card>
       </Container>
-
-      {/* Add Task Modal */}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Task</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form validated={validated}>
-            <Form.Group className="mb-3">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                required
-                type="text"
-                value={newTask.title}
-                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              />
-              <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                required
-                as="textarea"
-                rows={3}
-                value={newTask.description}
-                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-              />
-              <Form.Control.Feedback type="invalid">Description is required.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Column</Form.Label>
-              <Form.Select value={newTask.column} onChange={(e) => setNewTask({ ...newTask, column: e.target.value })}>
-                <option value="backlog">Backlog</option>
-                <option value="in-progress">In Progress</option>
-                <option value="review">Review</option>
-                <option value="done">Done</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowAddModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleAddSave} disabled={addTaskMutation.isPending}>
-            {addTaskMutation.isPending ? "Saving..." : "Save Task"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </main>
   );
 };
