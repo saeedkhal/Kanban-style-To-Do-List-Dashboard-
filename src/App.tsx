@@ -40,6 +40,7 @@ const KanbanBoard = () => {
     description: "",
     column: "backlog",
   });
+const [validated, setValidated] = useState(false); // --- IGNORE ---
 
   const [columnPages, setColumnPages] = useState<{ [key: string]: number }>({
     backlog: 1,
@@ -86,10 +87,11 @@ const KanbanBoard = () => {
   const handleDelete = (id: number) => deleteTaskMutation.mutate(id);
 
   const handleAddSave = () => {
-    if (!newTask.title.trim()) return;
+    if (!newTask.title.trim()) return setValidated(true); // --- IGNORE ---
     addTaskMutation.mutate(newTask);
     setNewTask({ title: "", description: "", column: "backlog" });
     setShowAddModal(false);
+    setValidated(false); // --- IGNORE ---
   };
 
   const handleEdit = (task: Task) => {
@@ -98,9 +100,10 @@ const KanbanBoard = () => {
   };
 
   const handleEditSave = () => {
-    if (!editingTask?.title?.trim() || !editingTask?.description?.trim()) return;
+    if (!editingTask?.title?.trim() || !editingTask?.description?.trim()) return setValidated(true); // --- IGNORE ---
     editTaskMutation.mutate(editingTask);
     setShowEditModal(false);
+    setValidated(false); // --- IGNORE ---
   };
 
   return (
@@ -218,7 +221,7 @@ const KanbanBoard = () => {
           <Modal.Title>Add Task</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form validated>
+          <Form validated={validated}>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
@@ -267,7 +270,7 @@ const KanbanBoard = () => {
           <Modal.Title>Edit Task</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form validated>
+          <Form validated={validated}>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
