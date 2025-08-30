@@ -9,7 +9,7 @@ type Task = {
   description: string;
   column: string;
 };
-function Task({
+function TaskCard({
   task,
   editTaskMutation,
   handleDelete,
@@ -45,4 +45,4 @@ function Task({
   );
 }
 
-export default Task;
+export default TaskCard;
