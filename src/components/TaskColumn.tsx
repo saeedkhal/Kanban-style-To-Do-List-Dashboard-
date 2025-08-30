@@ -4,14 +4,8 @@ import Pagination from "./Pagination";
 import TaskCard from "./Task";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-
-type Task = {
-  id: number;
-  title: string;
-  description: string;
-  column: string;
-};
-const TASKS_PER_PAGE = 5;
+import type { Task } from "../assets/typs";
+import { API_URL, TASKS_PER_PAGE } from "../assets/constans";
 
 function TaskColumn({
   col,
@@ -34,7 +28,7 @@ function TaskColumn({
     setColumnPages((prev) => ({ ...prev, [col]: newPage }));
   };
 
-  const API_URL = "http://localhost:4000/tasks";
+ 
   // Pagination logic for this column
   const colTasks = tasks.filter((task) => task.column === col.key);
   const page = columnPages[col.key] || 1;

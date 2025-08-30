@@ -6,17 +6,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Header from "./components/Header";
 import TaskColumn from "./components/TaskColumn";
 import type { Task } from "./assets/typs";
+import { API_URL, columns } from "./assets/constans";
 
 let timer: number | undefined = undefined;
-
-const columns = [
-  { key: "backlog", title: "Backlog" },
-  { key: "in-progress", title: "In Progress" },
-  { key: "review", title: "Review" },
-  { key: "done", title: "Done" },
-];
-
-const API_URL = "http://localhost:4000/tasks";
 
 const fetchTasks = async (search: string): Promise<Task[]> => {
   let url = API_URL;
