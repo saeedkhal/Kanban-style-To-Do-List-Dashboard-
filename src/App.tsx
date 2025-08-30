@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Card, Form } from "react-bootstrap";
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AddTaskModal from "./components/AddTaskModal";
 import TaskCard from "./components/Task";
+import Pagination from "./components/Pagination";
 
 let timer: number | undefined = undefined;
 type Task = {
@@ -131,29 +132,7 @@ const KanbanBoard = () => {
                         <TaskCard task={task} editTaskMutation={editTaskMutation} handleDelete={handleDelete} />
                       </div>
                     ))}
-                    {totalPages > 1 && (
-                      <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          disabled={page === 1}
-                          onClick={() => handlePageChange(page - 1, col.key)}
-                        >
-                          Prev
-                        </Button>
-                        <span>
-                          Page {page} of {totalPages}
-                        </span>
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          disabled={page === totalPages}
-                          onClick={() => handlePageChange(page + 1, col.key)}
-                        >
-                          Next
-                        </Button>
-                      </div>
-                    )}
+                    <Pagination totalPages={totalPages} page={page} handlePageChange={handlePageChange} col={col} />
                   </Col>
                 );
               })}
