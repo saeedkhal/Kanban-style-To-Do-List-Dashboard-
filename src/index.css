@@ -10,3 +10,7 @@
         border-right: 1px solid var(--bs-border-color-translucent) !important;
     }
 }
+
+.cursor-grabbing {
+    cursor: grabbing !important;
+}

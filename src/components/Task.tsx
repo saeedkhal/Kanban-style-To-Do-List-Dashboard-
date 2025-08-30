@@ -14,7 +14,7 @@ function TaskCard({
   handleDelete: (id: number) => void;
 }) {
   return (
-    <div>
+    <div className="cursor-grabbing">
       <Card
         draggable
         onDragStart={(e) => {
