@@ -1,13 +1,8 @@
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
+import type { Task } from "../assets/typs";
 
-type Task = {
-  id: number;
-  title: string;
-  description: string;
-  column: string;
-};
 function AddTaskModal({
   addTaskMutation,
 }: {

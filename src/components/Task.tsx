@@ -2,13 +2,8 @@ import { Button, Card } from "react-bootstrap";
 import EditTAskModal from "./EditTAskModal";
 import { Trash } from "react-bootstrap-icons";
 import type { UseMutationResult } from "@tanstack/react-query";
+import type { Task } from "../assets/typs";
 
-type Task = {
-  id: number;
-  title: string;
-  description: string;
-  column: string;
-};
 function TaskCard({
   task,
   editTaskMutation,

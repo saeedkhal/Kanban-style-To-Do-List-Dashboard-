@@ -5,14 +5,10 @@ import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Header from "./components/Header";
 import TaskColumn from "./components/TaskColumn";
+import type { Task } from "./assets/typs";
 
 let timer: number | undefined = undefined;
-type Task = {
-  id: number;
-  title: string;
-  description: string;
-  column: string;
-};
+
 const columns = [
   { key: "backlog", title: "Backlog" },
   { key: "in-progress", title: "In Progress" },
@@ -47,7 +43,7 @@ const KanbanBoard = () => {
     mutationFn: (task: Omit<Task, "id">) => axios.post<Task>(API_URL, task).then((res) => res.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
-  
+
   useEffect(() => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {

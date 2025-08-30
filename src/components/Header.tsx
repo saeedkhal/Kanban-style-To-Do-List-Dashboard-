@@ -1,13 +1,9 @@
 import { Col, Form, Row } from "react-bootstrap";
 import AddTaskModal from "./AddTaskModal";
 import type { UseMutationResult } from "@tanstack/react-query";
+import type { Task } from "../assets/typs";
 
-type Task = {
-  id: number;
-  title: string;
-  description: string;
-  column: string;
-};
+
 function Header({
   search,
   setSearch,
