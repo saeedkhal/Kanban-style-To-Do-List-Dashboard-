@@ -4,13 +4,13 @@
       "id": "1",
       "title": "new task 2",
       "description": "Create a mockup for the new login page",
-      "column": "backlog"
+      "column": "in-progress"
     },
     {
       "id": "2",
       "title": "Draft user survey",
       "description": "Prepare questions for the user feedback survey",
-      "column": "in-progress"
+      "column": "backlog"
     },
     {
       "id": "3",
@@ -39,20 +39,8 @@
     {
       "title": "new task",
       "description": "new task",
-      "column": "in-progress",
+      "column": "backlog",
       "id": "JgQHlR6"
-    },
-    {
-      "title": "new task",
-      "description": "new task",
-      "column": "backlog",
-      "id": "39aXeKh"
-    },
-    {
-      "title": "new task",
-      "description": "this is new task",
-      "column": "backlog",
-      "id": "UiHrVYR"
     }
   ]
 }
