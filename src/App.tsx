@@ -98,7 +98,7 @@ const KanbanBoard = () => {
   };
 
   const handleEditSave = () => {
-    if (!editingTask) return;
+    if (!editingTask?.title?.trim() || !editingTask?.description?.trim()) return;
     editTaskMutation.mutate(editingTask);
     setShowEditModal(false);
   };
@@ -218,23 +218,27 @@ const KanbanBoard = () => {
           <Modal.Title>Add Task</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form validated>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
+                required
                 type="text"
                 value={newTask.title}
                 onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
               />
+              <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
+                required
                 as="textarea"
                 rows={3}
                 value={newTask.description}
                 onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
               />
+              <Form.Control.Feedback type="invalid">Description is required.</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
               <Form.Label>Column</Form.Label>
@@ -263,23 +267,27 @@ const KanbanBoard = () => {
           <Modal.Title>Edit Task</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form validated>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
+                required
                 value={editingTask?.title || ""}
                 onChange={(e) => setEditingTask((prev) => (prev ? { ...prev, title: e.target.value } : null))}
               />
+              <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
+                required
                 value={editingTask?.description || ""}
                 onChange={(e) => setEditingTask((prev) => (prev ? { ...prev, description: e.target.value } : null))}
               />
+              <Form.Control.Feedback type="invalid">Description is required.</Form.Control.Feedback>
             </Form.Group>
             <Form.Group>
               <Form.Label>Column</Form.Label>
