@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
-import { Trash } from "react-bootstrap-icons";
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import EditTAskModal from "./components/EditTAskModal";
 import AddTaskModal from "./components/AddTaskModal";
+import TaskCard from "./components/Task";
 
 let timer: number | undefined = undefined;
 type Task = {
@@ -42,6 +41,9 @@ const KanbanBoard = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  const handlePageChange = (newPage: number, col: string) => {
+    setColumnPages((prev) => ({ ...prev, [col]: newPage }));
+  };
   useEffect(() => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
@@ -108,10 +110,6 @@ const KanbanBoard = () => {
                 const totalPages = Math.ceil(colTasks.length / TASKS_PER_PAGE) || 1;
                 const pagedTasks = colTasks.slice((page - 1) * TASKS_PER_PAGE, page * TASKS_PER_PAGE) || [];
 
-                const handlePageChange = (newPage: number) => {
-                  setColumnPages((prev) => ({ ...prev, [col.key]: newPage }));
-                };
-
                 return (
                   <Col
                     key={col.key}
@@ -129,27 +127,9 @@ const KanbanBoard = () => {
                   >
                     <h5 className="fw-bold mb-3">{col.title}</h5>
                     {pagedTasks?.map((task) => (
-                      <Card
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData("dragedTask", JSON.stringify(task));
-                        }}
-                        key={task.id}
-                        className="mb-3 shadow-sm"
-                      >
-                        <Card.Body>
-                          <Card.Title as="h6" className="fw-bold">
-                            {task.title}
-                          </Card.Title>
-                          <Card.Text className="small">{task.description}</Card.Text>
-                          <div className="d-flex justify-content-end gap-2">
-                            <EditTAskModal task={task} editTaskMutation={editTaskMutation} />
-                            <Button onClick={() => handleDelete(task.id)} variant="outline-danger" size="sm">
-                              <Trash />
-                            </Button>
-                          </div>
-                        </Card.Body>
-                      </Card>
+                      <div key={task.id}>
+                        <TaskCard task={task} editTaskMutation={editTaskMutation} handleDelete={handleDelete} />
+                      </div>
                     ))}
                     {totalPages > 1 && (
                       <div className="d-flex justify-content-center align-items-center gap-2 mt-2">
@@ -157,7 +137,7 @@ const KanbanBoard = () => {
                           variant="outline-secondary"
                           size="sm"
                           disabled={page === 1}
-                          onClick={() => handlePageChange(page - 1)}
+                          onClick={() => handlePageChange(page - 1, col.key)}
                         >
                           Prev
                         </Button>
@@ -168,7 +148,7 @@ const KanbanBoard = () => {
                           variant="outline-secondary"
                           size="sm"
                           disabled={page === totalPages}
-                          onClick={() => handlePageChange(page + 1)}
+                          onClick={() => handlePageChange(page + 1, col.key)}
                         >
                           Next
                         </Button>
