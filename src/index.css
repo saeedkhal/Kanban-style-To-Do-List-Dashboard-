@@ -1,0 +1,12 @@
+
+.responsive-border {
+    border-bottom: 1px solid var(--bs-border-color-translucent) !important;
+    border-right: none !important;
+}
+
+@media (min-width: 992px) {
+    .responsive-border {
+        border-bottom: none !important;
+        border-right: 1px solid var(--bs-border-color-translucent) !important;
+    }
+}

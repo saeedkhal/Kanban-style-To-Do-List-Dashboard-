@@ -156,7 +156,7 @@ const [validated, setValidated] = useState(false); // --- IGNORE ---
                         editTaskMutation.mutate({ ...task, column: col.key });
                       }
                     }}
-                    className={idx !== columns.length - 1 ? "border-end border-1 border-secondary-subtle" : ""}
+                    className={idx !== columns.length - 1 ? "responsive-border py-3" : "py-3"}
                   >
                     <h5 className="fw-bold mb-3">{col.title}</h5>
                     {pagedTasks?.map((task) => (
