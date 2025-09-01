@@ -2,7 +2,7 @@
   "tasks": [
     {
       "id": "1",
-      "title": "new task 2",
+      "title": "Create login page mockup",
       "description": "Create a mockup for the new login page",
       "column": "in-progress"
     },
