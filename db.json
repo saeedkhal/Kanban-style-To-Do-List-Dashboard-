@@ -23,24 +23,6 @@
       "title": "Code cleanup",
       "description": "Refactor code to improve readability",
       "column": "done"
-    },
-    {
-      "title": "fgdg",
-      "description": "dfgsdfg",
-      "column": "backlog",
-      "id": "b0c4TPm"
-    },
-    {
-      "title": "new task",
-      "description": "this is new task",
-      "column": "backlog",
-      "id": "eQ_CxA3"
-    },
-    {
-      "title": "new task",
-      "description": "new task",
-      "column": "backlog",
-      "id": "JgQHlR6"
     }
   ]
 }
